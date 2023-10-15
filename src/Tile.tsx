@@ -11,7 +11,7 @@ interface TileProps {
   col: number,
   onflip: Function,
   onflag: Function,
-  value?: number,
+  value: number,
 }
 
 const Tile: FC<TileProps> = (props) => {
@@ -25,6 +25,23 @@ const Tile: FC<TileProps> = (props) => {
     props.onflag(props.row, props.col)
   }
 
+  switch(props.value) {
+    case 0:
+      var backClass = 'tile-safe'
+      break
+    case 1:
+      var backClass = 'tile-unsafe'
+      break
+    case 2:
+      var backClass = 'tile-risky'
+      break
+    case 3:
+      var backClass = 'tile-dangerous'
+      break
+    default:
+      var backClass = 'tile-dangerous'
+  }
+
   return (
     <div 
       className={`board-tile ${props.revealed && "tile-revealed"} ${props.mine && "tile-mine"} `} 
@@ -32,8 +49,12 @@ const Tile: FC<TileProps> = (props) => {
       onContextMenu={(e) => handleFlag(e)}
     >
       <div className="tile-inner">
-        <div className={`tile-front ${props.flagged && "tile-flagged"}`}><div></div></div>
-        <div className="tile-back"><div>{props.value}</div></div>
+        <div className={`tile-front ${props.flagged && "tile-flagged"}`}>
+          <i className={`${props.flagged && "fa-solid fa-flag"}`}/>
+        </div>
+        <div className={`tile-back ${backClass}`}>
+          <div>{props.value > 0 && props.value}</div>
+        </div>
       </div>
     </div>
   )
