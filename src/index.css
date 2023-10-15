@@ -73,6 +73,10 @@ h1 {
 .tile-front {
   background-color: #e1e1e1;
 }
+.tile-flagged {
+  background: orange;
+}
+
 
 .tile-back {
   background-color: #3498db;
