@@ -46,6 +46,7 @@ function generateBoard(size: number, mines: number, handleTileFlip: Function, ha
           key={`tile-${i}-${j}`}
           row={i}
           col={j}
+          bgRotation={Math.floor(Math.random() * 360)}
           mine={false}
           flagged={false}
           revealed={false} // Initialize all tiles as not revealed
