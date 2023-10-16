@@ -1,5 +1,11 @@
 :root {
-  --flagged: #4885F4;
+  --green: #0F9D58;
+  --orange: #DB4437;
+  --blue: #4885F4;
+  --yellow: #F4B400;
+  --red : red;
+  --white: #eee;
+  --flagged: var(--blue);
 }
 
 body {
@@ -8,7 +14,6 @@ body {
 
 #root {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -19,9 +24,115 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+.content-block {
+  border: 2px solid lightgray;
+  background: var(--white);
+  padding: 2em;
+  border-radius: 1em;
+  width: 15em;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-display {
+  align-items: center;
+  padding-block: 3em;
+  gap: 1em;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  line-height: 0;
+}
+
+.control-button {
+  background-color: transparent;
+  padding: 1.5em;
+  border-radius: 50%;
+  color: var(--white);
+  border: 3px solid lightgray;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.play-button {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.play-button:hover {
+  background-color: var(--green);
+  color: var(--white);
+}
+
+.pause-button {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.pause-button:hover {
+  background-color: var(--orange);
+  color: var(--white);
+}
+
+.restart-button {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.restart-button:hover {
+  background-color: var(--yellow);
+  color: var(--white);
+}
+
+.reset-button {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.reset-button:hover {
+  background-color: var(--blue);
+  color: var(--white);
+}
+
+.stat-block {
+  width: 60%;
+  padding: 0.5em 0.25em;
+  border-radius: 1em;
+  box-shadow: 1px 1px 1px rgba(25,25,25,0.5);
+  font-size: 1.5em;
+  color: var(--white);
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.time-block {
+  background: var(--green)
+}
+
+.flags-block {
+  background: var(--blue);
+}
+
+.mines-block {
+  background: var(--orange);
 }
 
 .minesweeper-board {
@@ -31,9 +142,10 @@ h1 {
   width: 75vh;
   margin: 2em;
 
-  border: 3px solid lightgray;
+  border: 2px solid lightgray;
   border-radius: 2%;
   padding: 0.25em;
+  background: var(--white);
 }
 
 .board-row {
@@ -50,7 +162,7 @@ h1 {
 }
 
 .board-tile:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .board-tile::after {
@@ -60,7 +172,7 @@ h1 {
 }
 
 .tile-mine .tile-back {
-  background-color: red;
+  background-color: var(--red);
 }
 
 .tile-inner {
@@ -98,30 +210,51 @@ h1 {
 }
 
 .tile-flagged i {
-  color: #eee;
+  color: var(--white);
   font-size: 1.5em;
 }
 
 .tile-back {
   transform: rotateY(180deg);
-  background: white;
   font-size: 1.25em;
-  color: white;
+  color: var(--white);
 }
 
 .tile-safe {
-  background: #ccc;
+  background: lightgray;
 }
 
 .tile-unsafe {
-  background: #0F9D58;
+  background: var(--green);
 }
 
 .tile-risky {
-  background: #F4B400;
+  background: var(--yellow);
 }
 
 .tile-dangerous {
-  background: #DB4437;
+  background: var(--orange);
+}
+
+.options-display h2 {
+  text-align: center;
+  font-size: 2em;
+  margin-block: 0 1em;
+}
+
+.options-display label {
+  display: flex;
+  align-items: flex-end;
+}
+
+.options-display h4 {
+  margin: 0 0.2em;
+  font-size: 1.3em;
+}
+
+.muted-text {
+  color: #888;
+  font-size: 1em;
+  margin-bottom: 0.1em;
 }
 

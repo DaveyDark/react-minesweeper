@@ -1,4 +1,4 @@
-import { FC, cloneElement, useState } from "react";
+import { FC, useEffect, useReducer} from "react";
 import Tile from "./Tile";
 
 // Minesweeper board component
@@ -9,51 +9,64 @@ interface BoardProps {
   mines: number,
 }
 
-function countMines(board: JSX.Element[][], i: number, j: number) {
+interface TileOptions {
+  key: string,
+  mine: boolean,
+  revealed: boolean,
+  flagged: boolean,
+  row: number,
+  col: number,
+  bgRotation: number,
+  onflip: Function,
+  onflag: Function,
+  value: number,
+}
+
+function countMines(board: TileOptions[][], i: number, j: number) {
   let cnt = 0;
   for(let a=-1; a<=1; a++) {
     for(let b=-1; b<=1; b++) {
       if(a==0 && b==0) continue;
       if(i+a < 0 || j+b < 0 || i+a >= board.length || j+b >= board.length) continue;
-      if(board[i+a][j+b].props.mine) cnt++;
+      if(board[i+a][j+b].mine) cnt++;
     }
   }
   return cnt;
 }
 
-function revealTiles(board: JSX.Element[][], i: number, j: number) {
-  board[i][j] = cloneElement(board[i][j], {revealed: true})
-  if(board[i][j].props.value != 0 || board[i][j].props.mine) return;
+function revealTiles(board: TileOptions[][], i: number, j: number) {
+  board[i][j] = {...board[i][j] , revealed: true}
+  if(board[i][j].value != 0 || board[i][j].mine) return;
   for(let a=-1; a<=1; a++) {
     for(let b=-1; b<=1; b++) {
       if(a==0 && b==0) continue
       if(i+a < 0 || j+b < 0 || i+a >= board.length || j+b >= board.length) continue
-      if(!board[i+a][j+b].props.mine  && !board[i+a][j+b].props.revealed) revealTiles(board,i+a,j+b)
+      if(!board[i+a][j+b].mine  && !board[i+a][j+b].revealed) revealTiles(board,i+a,j+b)
     }
   }
 }
 
 // Generate the board based on given props
-function generateBoard(size: number, mines: number, handleTileFlip: Function, handleFlag: Function): JSX.Element[][] {
-  const board: JSX.Element[][] = [];
+function generateBoard(size: number, mines: number, handleTileFlip: Function, handleFlag: Function): TileOptions[][] {
+  const board: TileOptions[][] = [];
 
   // Create an empty board
   for (let i = 0; i < size; i++) {
-    const row: JSX.Element[] = [];
+    const row: TileOptions[] = [];
     for (let j = 0; j < size; j++) {
       row.push(
-        <Tile
-          key={`tile-${i}-${j}`}
-          row={i}
-          col={j}
-          bgRotation={Math.floor(Math.random() * 360)}
-          mine={false}
-          flagged={false}
-          revealed={false} // Initialize all tiles as not revealed
-          value={0} // You can set the value to any default value you want
-          onflip={handleTileFlip}
-          onflag={handleFlag}
-        />
+        {
+          key:`tile-${i}-${j}`,
+          row:i,
+          col:j,
+          bgRotation:Math.floor(Math.random() * 360),
+          mine:false,
+          flagged:false,
+          revealed:false,
+          value:0,
+          onflip:handleTileFlip,
+          onflag:handleFlag,
+        }
       );
     }
     board.push(row);
@@ -64,8 +77,8 @@ function generateBoard(size: number, mines: number, handleTileFlip: Function, ha
   while (m < mines) {
     const x = Math.floor(Math.random() * size);
     const y = Math.floor(Math.random() * size);
-    if (!board[x][y].props.mine) {
-      board[x][y] = cloneElement(board[x][y], { mine: true });
+    if (!board[x][y].mine) {
+      board[x][y] = {...board[x][y],  mine: true};
       m += 1;
     }
   }
@@ -73,36 +86,73 @@ function generateBoard(size: number, mines: number, handleTileFlip: Function, ha
   // Generate number values for tiles
   for(let i=0; i<board.length; i++) {
     for(let j=0; j<board.length; j++) {
-      board[i][j] = cloneElement(board[i][j], {value: countMines(board,i,j)})
+      board[i][j] = {...board[i][j], value: countMines(board,i,j)}
     }
   }
 
   return board;
 }
 
+interface TileRevealAction {
+  type: "TILE_REVEAL";
+  payload: { row: number; col: number };
+}
+
+interface TileFlagAction {
+  type: "TILE_FLAG";
+  payload: { row: number; col: number };
+}
+
+interface NewBoardAction {
+  type: "NEW_BOARD";
+  payload: { size: number; mines: number; handleTileFlip: Function, handleFlag: Function };
+}
+
+type Action = TileRevealAction | TileFlagAction | NewBoardAction;
+
+const boardReducer = (board: TileOptions[][], action: Action): TileOptions[][] => {
+  if(action.type == "NEW_BOARD") {
+    return generateBoard(action.payload.size, action.payload.mines, action.payload.handleTileFlip, action.payload.handleFlag)
+  }
+  const updatedBoard = board.map((row) => row.map((tile) => ({ ...tile })))
+  const {row,col} = action.payload
+  if(action.type == "TILE_REVEAL") {
+    if (updatedBoard[row][col].mine) {
+      alert("Game Over")
+    } else {
+      revealTiles(updatedBoard, row, col)
+    }
+  } else if (action.type == "TILE_FLAG") {
+    updatedBoard[row][col] = {
+      ...updatedBoard[row][col],
+      flagged: !updatedBoard[row][col].flagged,
+    };
+  }
+  return updatedBoard
+}
+
 const Minesweeper: FC<BoardProps> = (props) => {
-  const [board, setBoard] = useState(generateBoard(props.size, props.mines, handleTileFlip, handleFlag));
+  const [board, dispatch] = useReducer(boardReducer, generateBoard(props.size, props.mines, handleTileFlip, handleFlag));
+
+  useEffect(() => {
+    dispatch({type: "NEW_BOARD", payload: {size: props.size, mines: props.mines, handleTileFlip: handleTileFlip, handleFlag: handleFlag}})
+  }, [props.size, props.mines]);
 
   function handleTileFlip(i: number, j: number) {
-    if(board[i][j].props.mine) {
-      alert("Game Over")
-    }
-    const updatedBoard = [...board];
-    revealTiles(updatedBoard,i,j);
-    setBoard(updatedBoard);
+    dispatch({type: "TILE_REVEAL", payload: {row: i, col: j}})
   }
 
   function handleFlag(i: number, j: number) {
-    const updatedBoard = [...board];
-    updatedBoard[i][j] = cloneElement(updatedBoard[i][j], {flagged: !board[i][j].props.flagged})
-    setBoard(updatedBoard);
+    dispatch({type: "TILE_FLAG", payload: {row: i, col: j}})
   }
 
   return (
     <div className="minesweeper-board">
       {board.map((row, i) => (
         <div className="board-row" key={`row-${i}`}>
-          {row}
+          {row.map((tile) => 
+            <Tile {...tile} />
+          )}
         </div>
       ))}
     </div>
