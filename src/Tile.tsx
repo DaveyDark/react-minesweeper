@@ -1,20 +1,8 @@
 import { FC } from "react";
 import { useGameStateContext } from "./context";
+import { TileProps } from "./types";
 
 // This component represents a tile on the minesweeper board
-
-// Properties of the tile component
-interface TileProps {
-  mine: boolean,
-  revealed: boolean,
-  flagged: boolean,
-  row: number,
-  col: number,
-  bgRotation: number,
-  onflip: Function,
-  onflag: Function,
-  value: number,
-}
 
 const Tile: FC<TileProps> = (props) => {
   const [gameState, setState] = useGameStateContext()

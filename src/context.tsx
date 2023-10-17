@@ -6,7 +6,7 @@ export const GameStateContext = createContext<[GameState, any]>([GameState.waiti
 export const useGameStateContext = () => {
   const context = useContext(GameStateContext);
   if (!context) {
-    throw new Error('useMyContext must be used within a MyProvider');
+    throw new Error('context must be used within a Provider');
   }
   return context;
 };
