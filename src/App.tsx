@@ -197,7 +197,7 @@ export default function App() {
     <GameStateContext.Provider value={[gameState,setState]}>
       <StatsDisplay mines={options.mines} flags={countFlags(board)} />
       <div className="main-content">
-      <h1>M i n e s w e e p e r</h1>
+      <h1>MINESWEEPER</h1>
       <Board {...options} board={board} />
       </div>
       <OptionsDisplay {...options} resetBoard={resetBoard} regenBoard={regenBoard} onChangeHandler={changeOptions} />
