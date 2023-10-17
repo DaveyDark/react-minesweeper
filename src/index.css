@@ -2,7 +2,7 @@
   --green: #0F9D58;
   --orange: #DB4437;
   --blue: #4885F4;
-  --yellow: #F4B400;
+  --yellow: #F4A400;
   --red : red;
   --white: #eee;
   --flagged: var(--blue);
@@ -59,6 +59,7 @@ h1 {
   justify-content: space-evenly;
   width: 100%;
   line-height: 0;
+  margin-bottom: 1em;
 }
 
 .control-button {
@@ -124,6 +125,10 @@ h1 {
 }
 
 .time-block {
+  background: var(--yellow)
+}
+
+.time-block-started {
   background: var(--green)
 }
 

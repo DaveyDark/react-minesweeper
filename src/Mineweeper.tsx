@@ -1,5 +1,7 @@
 import { FC, useEffect, useReducer} from "react";
 import Tile from "./Tile";
+import { GameState } from "./enums";
+import { useGameStateContext } from "./context";
 
 // Minesweeper board component
 
@@ -114,11 +116,15 @@ const boardReducer = (board: TileOptions[][], action: Action): TileOptions[][] =
   if(action.type == "NEW_BOARD") {
     return generateBoard(action.payload.size, action.payload.mines, action.payload.handleTileFlip, action.payload.handleFlag)
   }
-  const updatedBoard = board.map((row) => row.map((tile) => ({ ...tile })))
+  let updatedBoard = board.map((row) => row.map((tile) => ({ ...tile })))
   const {row,col} = action.payload
   if(action.type == "TILE_REVEAL") {
     if (updatedBoard[row][col].mine) {
-      alert("Game Over")
+      updatedBoard = updatedBoard.map(row => {
+        return row.map(tile => {
+          return {...tile, revealed: true}
+        })
+      })
     } else {
       revealTiles(updatedBoard, row, col)
     }
@@ -134,16 +140,33 @@ const boardReducer = (board: TileOptions[][], action: Action): TileOptions[][] =
 const Minesweeper: FC<BoardProps> = (props) => {
   const [board, dispatch] = useReducer(boardReducer, generateBoard(props.size, props.mines, handleTileFlip, handleFlag));
 
+  const [gameState, setState] = useGameStateContext()
+
   useEffect(() => {
     dispatch({type: "NEW_BOARD", payload: {size: props.size, mines: props.mines, handleTileFlip: handleTileFlip, handleFlag: handleFlag}})
   }, [props.size, props.mines]);
 
-  function handleTileFlip(i: number, j: number) {
+  function handleTileFlip(i: number, j: number, gameState: GameState, setState: Function) {
+    if(gameState == GameState.over) return
+    if(gameState == GameState.waiting) setState(GameState.started)
     dispatch({type: "TILE_REVEAL", payload: {row: i, col: j}})
   }
 
-  function handleFlag(i: number, j: number) {
+  function handleFlag(i: number, j: number, gameState: GameState, setState: Function) {
+    if(gameState == GameState.over) return
+    if(gameState == GameState.waiting) setState(GameState.started)
     dispatch({type: "TILE_FLAG", payload: {row: i, col: j}})
+  }
+
+  //Check Game Over
+  if(gameState == GameState.started) {
+    let gameOver = true
+    board.map(row => {
+      row.map(tile => {
+        if(tile.mine && !tile.revealed) gameOver = false
+      })
+    })
+    if(gameOver) setState(GameState.over)
   }
 
   return (

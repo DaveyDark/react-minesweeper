@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { useGameStateContext } from "./context";
 
 // This component represents a tile on the minesweeper board
 
@@ -16,14 +17,16 @@ interface TileProps {
 }
 
 const Tile: FC<TileProps> = (props) => {
+  const [gameState, setState] = useGameStateContext()
+
   function handleFlip() {
     if(props.revealed || props.flagged) return;
-    props.onflip(props.row, props.col)
+    props.onflip(props.row, props.col, gameState, setState)
   }
 
   function handleFlag(e: any) {
     e.preventDefault()
-    props.onflag(props.row, props.col)
+    props.onflag(props.row, props.col, gameState, setState)
   }
 
   switch(props.value) {

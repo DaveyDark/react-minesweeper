@@ -1,0 +1,6 @@
+export enum GameState {
+  waiting,
+  started,
+  over,
+}
+
