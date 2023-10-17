@@ -147,13 +147,13 @@ export default function App() {
   const [gameState, setState] = useState(GameState.waiting)
 
   function handleTileFlip(i: number, j: number, gameState: GameState, setState: Function) {
-    if(gameState == GameState.over) return
+    if(gameState == GameState.over || gameState == GameState.won) return
     if(gameState == GameState.waiting) setState(GameState.started)
     dispatch({type: "TILE_REVEAL", payload: {row: i, col: j}})
   }
 
   function handleFlag(i: number, j: number, gameState: GameState, setState: Function) {
-    if(gameState == GameState.over) return
+    if(gameState == GameState.over || gameState == GameState.won) return
     if(gameState == GameState.waiting) setState(GameState.started)
     dispatch({type: "TILE_FLAG", payload: {row: i, col: j}})
   }
@@ -175,12 +175,16 @@ export default function App() {
   //Check Game Over
   if(gameState == GameState.started) {
     let gameOver = true
+    let gameWon = true
     board.map(row => {
       row.map(tile => {
         if(!tile.mine && !tile.revealed) gameOver = false
+        if(!tile.mine && !tile.revealed) gameWon = false
+        if(tile.mine && tile.revealed) gameWon = false
       })
     })
-    if(gameOver) setState(GameState.over)
+    if(gameWon) setState(GameState.won)
+    else if(gameOver) setState(GameState.over)
   }
 
   function changeOptions(newOptions: Partial<GameOptions>) {
@@ -191,12 +195,12 @@ export default function App() {
 
   return (
     <GameStateContext.Provider value={[gameState,setState]}>
-      <StatsDisplay resetBoard={resetBoard} regenBoard={regenBoard} mines={options.mines} flags={countFlags(board)} />
+      <StatsDisplay mines={options.mines} flags={countFlags(board)} />
       <div className="main-content">
       <h1>Minesweeper</h1>
       <Board {...options} board={board} />
       </div>
-      <OptionsDisplay {...options} onChangeHandler={changeOptions} />
+      <OptionsDisplay {...options} resetBoard={resetBoard} regenBoard={regenBoard} onChangeHandler={changeOptions} />
     </GameStateContext.Provider>
   )
 }

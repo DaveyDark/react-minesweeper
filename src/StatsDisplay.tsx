@@ -7,7 +7,7 @@ const StatsDisplay: FC<StatsProps> = (props) => {
   const [time, setTime] = useState(0);
   const [timer, setTimer] = useState<any>(null);
 
-  const [gameState, setState] = useGameStateContext()
+  const [gameState, _] = useGameStateContext()
 
   useEffect(() => {
     if(gameState == GameState.started) {
@@ -16,7 +16,7 @@ const StatsDisplay: FC<StatsProps> = (props) => {
         setTime((last) => last+1)
       },1000)
       setTimer(timer)
-    } else if(gameState == GameState.over) {
+    } else if(gameState == GameState.over || gameState == GameState.won) {
       clearInterval(timer)
     } else {
       if(timer) clearInterval(timer)
@@ -26,14 +26,14 @@ const StatsDisplay: FC<StatsProps> = (props) => {
 
   return (
     <div className="content-block stats-display">
-      <span className="controls-container">
-        {gameState == GameState.waiting && <i onClick={() => setState(GameState.started)} className="control-button play-button fa-solid fa-play"/>}
-        {gameState == GameState.started && <i onClick={() => setState(GameState.over)} className="control-button pause-button fa-solid fa-stop"/>}
-        {gameState == GameState.over && <i onClick={() => props.resetBoard()} className="control-button restart-button fa-solid fa-rotate-right"/>}
-        <i onClick={() => props.regenBoard()} className="control-button reset-button fa-solid fa-rotate"/>
-      </span>
+      <h2>
+        {gameState == GameState.waiting && "Click a tile to Start"}
+        {gameState == GameState.started && "Keep going!"}
+        {gameState == GameState.won && "You Win!"}
+        {gameState == GameState.over && "Game Over"}
+      </h2>
       <span 
-        className={`stat-block ${gameState != GameState.over ? 'time-block-started':'time-block'}`}>
+        className={`stat-block ${gameState != GameState.over && gameState != GameState.won ? 'time-block-started':'time-block'}`}>
           <i className="fa-regular fa-clock" />{time.toString().padStart(3, '0')}
       </span>
       <span 

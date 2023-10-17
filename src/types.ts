@@ -30,8 +30,6 @@ export interface TileProps {
 }
 
 export interface StatsProps {
-  resetBoard: Function,
-  regenBoard: Function,
   flags: number,
   mines: number,
 }
@@ -39,5 +37,13 @@ export interface StatsProps {
 export interface GameOptions {
   size: number,
   mines: number,
+}
+
+export interface OptionsProps {
+  size: number,
+  mines: number,
+  onChangeHandler: Function,
+  resetBoard: Function,
+  regenBoard: Function,
 }
 
