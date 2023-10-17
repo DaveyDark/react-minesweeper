@@ -10,6 +10,9 @@
 
 body {
   margin: 0;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #root {
@@ -62,6 +65,7 @@ h1 {
 }
 
 .control-button {
+  cursor: pointer;
   background-color: transparent;
   padding: 1.5em;
   border-radius: 50%;
@@ -159,6 +163,7 @@ h1 {
 }
 
 .board-tile {
+  cursor: pointer;
   flex: 1;
   perspective: 1000px;
   margin: 0.25em;
